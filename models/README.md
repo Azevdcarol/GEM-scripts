@@ -13,7 +13,7 @@ Models may include:
 
 ## Organization
 
-Models should preferably be organized by organism or model identifier.
+Models organized by organism.
 
 ```text
 models/
