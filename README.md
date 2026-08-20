@@ -34,10 +34,11 @@ The analyses use several tools and Python packages commonly employed in constrai
 * NumPy
 * Matplotlib
 
-## 📁 Repository Structure ( building...)
+## 📁 Repository Structure 
+> 🚧 **Under construction:** The repository structure is currently being organized and may change as the project develops.
 
-```
-
+```text
+.
 ├── README.md
 │
 ├── reconstruction/
