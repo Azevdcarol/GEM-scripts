@@ -1,0 +1,29 @@
+#CARREGANDO O MMEG 
+
+model = load_model('iCac802.xml')
+
+
+#MOSTRANDO INFORMAÇÕES DO MMMEG 
+
+print(f'{len(model.reactions)} reactions initially')
+print(f'{len(model.metabolites)} metabolites initially')
+print(f'{len(model.genes)} genes initially')
+
+model.medium  
+
+
+#TESTANDO CRESCIMENTO 
+solution = model.optimize()
+
+print("Crescimento:", solution.objective_value)
+
+#EXIBINDO REAÇÕES DE EXCHANGE 
+
+exchange_rxns = model.exchanges
+for rxn in exchange_rxns:
+    print(rxn.id, rxn.lower_bound, rxn.upper_bound)
+
+
+# Listar todos os metabólitos do modelo
+for met in model.metabolites:
+    print(f"ID: {met.id}, Nome: {met.name}")
