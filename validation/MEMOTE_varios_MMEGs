@@ -1,3 +1,18 @@
+# VERIFICAR A VERSÃO DO MEMOTE
+
+!memote --version
+
+#INSTALANDO O MEMOTE 
+
+%pip install memote
+
+
+# EXIBINDO COMANDOS DO MEMOTE
+
+!memote report snapshot --help
+
+
+
 
 # RODANDO MEMOTE PARA VARIOS MODELOS E GERANDO UM HTML PARA EXIBIÇÃO
 
