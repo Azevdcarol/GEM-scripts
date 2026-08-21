@@ -1,1 +1,9 @@
 
+#RODANDO MEMOTE PARA UM ÚNICO MODELO
+#EXEMPLO
+
+!memote run iCac802.xml --filename iCac802_memote_report.html
+
+
+#RODANDO E GERANDO REPORT EM HTML
+!memote report snapshot iHN637.xml --filename iHN637_memote_report.html
