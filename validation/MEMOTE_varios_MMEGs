@@ -1,0 +1,481 @@
+# VERIFICAR A VERSÃO DO MEMOTE
+
+!memote --version
+
+# EXIBINDO COMANDOS DO MEMOTE
+
+!memote report snapshot --help
+
+# RODANDO MEMOTE PARA VARIOS MODELOS E GERANDO UM HTML PARA EXIBIÇÃO
+
+from pathlib import Path
+import subprocess
+import html
+import re
+
+
+# ============================================================
+# CONFIGURAÇÕES
+# ============================================================
+
+PASTA_MODELOS = Path("modelos")
+PASTA_RESULTADOS = Path("resultados_memote")
+
+# Solver utilizado pelo MEMOTE
+SOLVER = "gurobi"
+
+# ============================================================
+# CRIAR PASTAS
+# ============================================================
+
+PASTA_RESULTADOS.mkdir(exist_ok=True)
+PASTA_MODELOS.mkdir(exist_ok=True)
+
+# ============================================================
+# ENCONTRAR MODELOS
+# ============================================================
+
+modelos = sorted(PASTA_MODELOS.glob("*.xml"))
+
+if not modelos:
+    raise FileNotFoundError(
+        f"Nenhum arquivo .xml encontrado em: {PASTA_MODELOS.resolve()}"
+    )
+
+print(f"{len(modelos)} modelo(s) encontrado(s):")
+
+for modelo in modelos:
+    print(f"  - {modelo.name}")
+
+
+# ============================================================
+# EXECUTAR MEMOTE
+# ============================================================
+
+resultados = []
+
+for modelo in modelos:
+
+    nome_modelo = modelo.stem
+
+    pasta_modelo = PASTA_RESULTADOS / nome_modelo
+    pasta_modelo.mkdir(exist_ok=True)
+
+    arquivo_html = pasta_modelo / "report.html"
+
+    print("\n" + "=" * 70)
+    print(f"MODELO: {nome_modelo}")
+    print("=" * 70)
+
+    comando = [
+        "memote",
+        "report",
+        "snapshot",
+        str(modelo),
+        "--filename",
+        str(arquivo_html),
+        "--solver",
+        SOLVER
+    ]
+
+    print("Executando:")
+    print(" ".join(comando))
+
+    processo = subprocess.run(
+        comando,
+        capture_output=True,
+        text=True
+    )
+
+    if processo.returncode == 0:
+
+        print("✓ MEMOTE concluído")
+
+        resultados.append({
+            "modelo": nome_modelo,
+            "arquivo": arquivo_html,
+            "status": "Concluído"
+        })
+
+    else:
+
+        print("✗ ERRO ao executar MEMOTE")
+        print(processo.stderr)
+
+        resultados.append({
+            "modelo": nome_modelo,
+            "arquivo": None,
+            "status": "Erro"
+        })
+
+
+# ============================================================
+# GERAR INDEX.HTML
+# ============================================================
+
+linhas = []
+
+for resultado in resultados:
+
+    nome = html.escape(resultado["modelo"])
+
+    if resultado["arquivo"] is not None:
+
+        link = f"{nome}/report.html"
+
+        linhas.append(f"""
+        <tr>
+            <td><strong>{nome}</strong></td>
+            <td class="success">✓ Concluído</td>
+            <td>
+                <a href="{link}" class="button">
+                    Abrir relatório
+                </a>
+            </td>
+        </tr>
+        """)
+
+    else:
+
+        linhas.append(f"""
+        <tr>
+            <td><strong>{nome}</strong></td>
+            <td class="error">✗ Erro</td>
+            <td>-</td>
+        </tr>
+        """)
+
+
+index_html = f"""
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>MEMOTE — Avaliação dos modelos metabólicos</title>
+
+<style>
+
+* {{
+    box-sizing: border-box;
+}}
+
+body {{
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    background: #f4f6f8;
+    color: #1f2937;
+}}
+
+.header {{
+    background: linear-gradient(
+        135deg,
+        #1e293b,
+        #334155
+    );
+
+    color: white;
+
+    padding: 45px 20px;
+
+    text-align: center;
+}}
+
+.header h1 {{
+    margin: 0;
+
+    font-size: 32px;
+
+    font-weight: 700;
+}}
+
+.header p {{
+    margin-top: 10px;
+
+    color: #cbd5e1;
+
+    font-size: 16px;
+}}
+
+.container {{
+    max-width: 1000px;
+
+    margin: 40px auto;
+
+    padding: 0 20px;
+}}
+
+.card {{
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 25px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.06);
+}}
+
+.card h2 {{
+    margin-top: 0;
+
+    font-size: 20px;
+}}
+
+table {{
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
+}}
+
+th {{
+    text-align: left;
+
+    background: #f1f5f9;
+
+    padding: 14px;
+
+    font-size: 14px;
+
+    color: #475569;
+}}
+
+td {{
+    padding: 16px 14px;
+
+    border-top: 1px solid #e5e7eb;
+}}
+
+tr:hover {{
+    background: #f8fafc;
+}}
+
+.success {{
+    color: #15803d;
+
+    font-weight: 600;
+}}
+
+.error {{
+    color: #b91c1c;
+
+    font-weight: 600;
+}}
+
+.button {{
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border-radius: 7px;
+
+    background: #2563eb;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}}
+
+.button:hover {{
+    background: #1d4ed8;
+}}
+
+.info {{
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 15px;
+
+    margin-top: 20px;
+}}
+
+.info-box {{
+    background: #f8fafc;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    text-align: center;
+}}
+
+.info-number {{
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: #2563eb;
+}}
+
+.info-label {{
+    margin-top: 5px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}}
+
+.footer {{
+    text-align: center;
+
+    padding: 30px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>MEMOTE</h1>
+
+    <p>
+        Avaliação da qualidade dos modelos metabólicos
+    </p>
+
+</div>
+
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Resumo</h2>
+
+        <div class="info">
+
+            <div class="info-box">
+
+                <div class="info-number">
+                    {len(modelos)}
+                </div>
+
+                <div class="info-label">
+                    Modelos analisados
+                </div>
+
+            </div>
+
+            <div class="info-box">
+
+                <div class="info-number">
+                    {sum(
+                        r["status"] == "Concluído"
+                        for r in resultados
+                    )}
+                </div>
+
+                <div class="info-label">
+                    Relatórios concluídos
+                </div>
+
+            </div>
+
+            <div class="info-box">
+
+                <div class="info-number">
+                    {sum(
+                        r["status"] == "Erro"
+                        for r in resultados
+                    )}
+                </div>
+
+                <div class="info-label">
+                    Erros
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Modelos metabólicos</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Modelo</th>
+
+                    <th>Status</th>
+
+                    <th>Relatório</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {"".join(linhas)}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="footer">
+
+    Relatórios gerados automaticamente com MEMOTE 0.17.0
+
+</div>
+
+</body>
+
+</html>
+"""
+
+
+arquivo_index = PASTA_RESULTADOS / "index.html"
+
+arquivo_index.write_text(
+    index_html,
+    encoding="utf-8"
+)
+
+
+print("\n" + "=" * 70)
+print("PROCESSO CONCLUÍDO")
+print("=" * 70)
+
+print(f"\nPágina principal:")
+print(arquivo_index.resolve())
