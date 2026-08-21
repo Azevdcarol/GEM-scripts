@@ -2,6 +2,11 @@
 
 !memote --version
 
+#INSTALANDO O MEMOTE 
+
+%pip install memote
+
+
 # EXIBINDO COMANDOS DO MEMOTE
 
 !memote report snapshot --help
