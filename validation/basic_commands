@@ -1,0 +1,9 @@
+# VERIFICAR A VERSÃO DO MEMOTE
+
+!memote --version
+
+# EXIBINDO COMANDOS DO MEMOTE
+
+!memote report snapshot --help
+
+
