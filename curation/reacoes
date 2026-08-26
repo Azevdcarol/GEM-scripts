@@ -1,0 +1,63 @@
+
+
+#Para exibir informações de reações do modelo, buscando pelo ID 
+a = model.reactions.get_by_id("L_LACD2")
+a
+
+================================================================================================
+#exibindo todas as reações de exchange
+import pandas as pd
+
+# Criar lista com informações das reações de troca
+exchange_data = []
+
+for rxn in model.exchanges:
+    exchange_data.append({
+        "Reação (ID)": rxn.id,
+        "Nome da Reação": rxn.name,  # Nome descritivo da reação
+        #"Metabólito Relacionado": list(rxn.metabolites.keys())[0].name,  # Nome do metabólito principal
+        "Lower Bound": rxn.lower_bound,  # Fluxo mínimo permitido
+        "Upper Bound": rxn.upper_bound   # Fluxo máximo permitido
+    })
+
+# Criar DataFrame
+exchange_df = pd.DataFrame(exchange_data)
+
+
+# Forçar exibição de todas as linhas e colunas
+pd.set_option('display.max_rows', None)  
+pd.set_option('display.max_columns', None)  
+pd.set_option('display.width', 1000)  
+
+# Exibir tabela
+print(exchange_df)
+
+=============================================================================================
+#exibindo fluxos relevantes
+
+print(solution.fluxes[solution.fluxes > 0.1])  
+
+
+==============================================================================================
+#exibindo as reações mais importantes 
+
+import pandas as pd
+
+fluxes_df = pd.DataFrame({"Reação": solution.fluxes.index, "Fluxo": solution.fluxes.values})
+fluxes_df = fluxes_df[fluxes_df["Fluxo"].abs() > 1e-6]  # Remove fluxos insignificantes
+fluxes_df = fluxes_df.sort_values(by="Fluxo", ascending=False)  # Ordena por intensidade
+
+print(fluxes_df.head(20))  # Exibe as 20 reações mais ativas
+
+=============================================================================================
+#identificando reações limitantes
+
+limite_superior = solution.fluxes[solution.fluxes == model.upper_bound]
+limite_inferior = solution.fluxes[solution.fluxes == model.lower_bound]
+
+print("Reações atingindo o limite superior:")
+print(limite_superior)
+
+print("Reações atingindo o limite inferior:")
+print(limite_inferior)
+==============================================================================================
