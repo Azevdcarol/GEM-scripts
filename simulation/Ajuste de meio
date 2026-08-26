@@ -1,0 +1,48 @@
+# Script para ajustar o meio de cultura considerando:
+    # O2
+    # Função objetivo 
+    # Quantidade da fonte de carbono 
+    # Fonte de carbono (glicose ou glicerol)
+
+def ajustar_meio(fonte_carbono, qtd_carbono, qtd_oxigenio, objetivo):
+    global model    
+    
+    fonte_dict = {
+        # glicose
+        "glicose": "EX_glc__D_e","gli": "EX_glc__D_e", "glucose": "EX_glc__D_e",
+        # glicerol
+        "glicerol": "EX_glyc_e","gly": "EX_glyc_e", "glycerol": "EX_glyc_e", 
+    }
+
+    busca = fonte_carbono.lower() #transforma em letras minúsculas
+
+    if busca in fonte_dict:
+        fonte_id = fonte_dict[busca]
+    else:
+        try:
+            fonte_id = model.reactions.get_by_id(fonte_carbono).id
+        except KeyError:
+            raise ValueError(f"Fonte de carbono '{fonte_carbono}' não encontrada no modelo.")
+
+
+    c = model.reactions.get_by_id(fonte_id)
+    c.lower_bound = -qtd_carbono
+    c.upper_bound = qtd_carbono + 0.01
+
+
+    # Ajuste do oxigênio
+    if "EX_o2_e" in model.reactions:
+        reac_o2 = model.reactions.get_by_id("EX_o2_e")
+        reac_o2.lower_bound = -qtd_oxigenio
+        reac_o2.upper_bound = qtd_oxigenio + 0.01
+    else:
+        raise ValueError("Reação 'EX_o2_e' não encontrada.")
+
+    # Definir objetivo
+    if objetivo in model.reactions:
+        model.objective = objetivo
+    else:
+        raise ValueError(f"Reação '{objetivo}' não encontrada para função objetivo.")
+
+
+
