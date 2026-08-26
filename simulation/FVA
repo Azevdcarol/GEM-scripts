@@ -1,0 +1,88 @@
+import pandas as pd
+
+#Função para preparar o FVA
+
+def preparar_fva(fva_df, model, solution):
+    """
+    Adiciona informações extras ao resultado do FVA e organiza as colunas.
+    """
+
+    # Criar uma cópia para não alterar o DataFrame original
+    fva = fva_df.copy()
+
+    # Fluxo da solução ótima da FBA
+    fva["flux_FBA"] = solution.fluxes
+
+    # Nome da reação
+    fva["name"] = [
+        model.reactions.get_by_id(rxn).name
+        for rxn in fva.index
+    ]
+
+    # Equação
+    fva["equation"] = [
+        model.reactions.get_by_id(rxn).reaction
+        for rxn in fva.index
+    ]
+
+    # Compartimento
+    fva["compartment"] = [
+        ", ".join(sorted(model.reactions.get_by_id(rxn).compartments))
+        for rxn in fva.index
+    ]
+
+    # Amplitude do FVA
+    fva["range"] = fva["maximum"] - fva["minimum"]
+
+    # Transformar o índice em coluna
+    fva = fva.reset_index().rename(columns={"index": "reaction"})
+
+    # Ordenar as colunas
+    return fva[
+        [
+            "reaction",
+            "name",
+            "equation",
+            "compartment",
+            "flux_FBA",
+            "minimum",
+            "maximum",
+            "range"
+        ]
+    ]
+
+
+#rodando o FVA
+
+#A)        SIMULANDO CRESCIMENTO
+#condições:
+    #objetivo: biomassa / oxigenio: presente / fonte de carbono: glicose
+        #monitorar formação de S-acetoina
+with model:    
+    ajustar_meio("EX_glc__D_e", 18.5, 1000, "BIOMASS_")
+
+      # Primeiro: rodar FBA normal
+    solution_crescimento_glicose_aero = model.optimize()
+    print("\nTaxa ótima de crescimento:", solution_crescimento_glicose_aero.objective_value)
+
+    
+    print("Objetivo:", model.objective.expression)
+    print("\nFluxo de biomassa",solution_crescimento_glicose_aero.fluxes["BIOMASS_"])
+
+    print("Glicose:",
+          model.reactions.EX_glc__D_e.bounds)
+
+    print("Glicerol:",
+          model.reactions.EX_glyc_e.bounds)
+
+    print("Oxigênio:",
+      model.reactions.EX_o2_e.bounds)
+    
+    print("BDO:", solution_crescimento_glicose_aero.fluxes["EX_btd__RS_e"])
+
+  
+    # Agora: rodar FVA
+    # Por padrão, calcula os intervalos mantendo 100% do ótimo
+    fva_crescimento_glicose_aero = flux_variability_analysis(model, fraction_of_optimum= x)
+
+
