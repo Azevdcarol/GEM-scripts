@@ -1,39 +1,3 @@
-#Não esquecer de fazer os imports necessários
-
-#Adicionando um nova reação 
-
-reaction = Reaction("Meso_BTDD_teste")
-reaction.name = "BDO_teste"
-#reaction.subsystem = "Subsystem Name" 
-reaction.lower_bound = 0 
-reaction.upper_bound = 1000
-
-metabolite_A = model.metabolites.get_by_id("coa_c")
-metabolite_B = model.metabolites.get_by_id("nadh_c")
-metabolite_C = model.metabolites.get_by_id("pyr_c")
-metabolite_D = model.metabolites.get_by_id("ACP_c")
-
-reaction.add_metabolites({ 
-    metabolite_A: -1.0, # Reagente 
-    metabolite_B: -2.0, # Reagente 
-    metabolite_C: 1.0, # Produto 
-    metabolite_D: 2.0 
-})
-
-model.add_reactions([reaction])
-print("\n")
-print(model.reactions.get_by_id("Meso_BTDD"))
-print(reaction.reaction)
-
-print("\nNew")
-print(f'{len(model.reactions)} reactions after modification')
-print(f'{len(model.metabolites)} metabolites after modification')
-print(f'{len(model.genes)} genes after modification')
-==================================================================================================
-#criando um gene 
-
-g = Gene("KPN_00000")
-g.name = "RR_dhBut"
 
 ================================================================================================== 
 #associando um gene a um reação
