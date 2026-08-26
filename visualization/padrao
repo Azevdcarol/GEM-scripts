@@ -1,0 +1,61 @@
+
+
+fluxo_1_aero = [18.5,17.38369923,16.26739846,14.99731843,12.93272727,
+                   10.77727273,8.621818182,6.466363636,4.310909091,2.155454545,0]
+biomassa_1_aero = [0,0.1865153807,0.3730307615,0.5595461422,0.7460615229,
+                      0.9325769036,1.119092284,1.305607665,1.492123046,1.678638427,1.865153807]
+
+
+fluxo_1_anaero = [17.7094,17.30627772,16.90318045,16.50008317,16.0969859,
+                  14.40287847,12.39618144,9.844615385,6.563076923,3.281538462,0]
+biomassa_1_anaero = [0,0.05032259837,0.1006451967,0.1509677951,0.2012903935,
+                     0.2516129918,0.3019355902,0.3522581886,0.4025807869,0.4529033853,0.5032259837]
+
+fluxo_2_aero = [19.7070,18.4297231,17.1524462,15.87516931,14.58958814,
+                12.33140909,9.865127273,7.398845455,4.932563636,2.466281818,0]
+biomassa_2_aero =  [0,0.2134118269,0.4268236538,0.6402354806,0.8536473075,
+                    1.067059134,1.280470961,1.493882788,1.707294615,1.920706442,2.134118269]
+
+fluxo_2_anaero =  [17.1443,16.76397324,16.38366523,15.46680259,13.57355497,
+                   11.68030735,9.787059729,7.893812108,5.949477175,3.096015385,0]
+biomassa_2_anaero = [0.0,0.04747759033,0.09495518067,0.142432771,
+                     0.1899103613,0.2373879517,0.284865542,0.3323431323,0.3798207227,0.427298313,0.4747759033]
+
+ms = 60
+lw = 2
+
+colors = {
+    "Glicose_aero": "#5b8ac9",
+    "Glicose_anaero": "#264993",
+    "Glicerol_aero": "#EC8C74",
+    "Glicerol_anaero": "#A24E39"}
+
+# ------------------ gráfico ------------------
+
+plt.figure(figsize=(10,7))
+
+plt.scatter(biomassa_1_aero, fluxo_1_aero, label="Glicose aeróbica", marker="o",s=ms, color=colors["Glicose_aero"])
+plt.scatter(biomassa_1_anaero, fluxo_1_anaero, label="Glicose anaeróbica", marker="o",s=ms, color=colors["Glicose_anaero"])
+plt.scatter(biomassa_2_aero, fluxo_2_aero, label="Glicerol aeróbica",marker="s",s=ms, color=colors["Glicerol_aero"], linewidth=lw )
+plt.scatter(biomassa_2_anaero, fluxo_2_anaero, label="Glicerol anaeróbica", marker="s",s=ms, color=colors["Glicerol_anaero"], linewidth=lw)
+
+plt.plot(biomassa_1_aero, fluxo_1_aero, color=colors["Glicose_aero"], linewidth=lw)
+plt.plot(biomassa_1_anaero, fluxo_1_anaero, color=colors["Glicose_anaero"],linestyle="--", linewidth=lw)
+plt.plot(biomassa_2_aero, fluxo_2_aero,color=colors["Glicerol_aero"], linewidth=lw)
+plt.plot(biomassa_2_anaero, fluxo_2_anaero,color=colors["Glicerol_anaero"], linestyle="--", linewidth=lw)
+
+plt.xlabel("Biomassa, μ (h$^{-1}$)", fontsize=14)
+plt.ylabel("Fluxo meso-BDO (mmol/gDCW/h)" , fontsize=14)
+plt.legend()
+plt.title("Produção de meso-BDO X Biomassa ", fontsize=18)
+plt.tick_params(direction="in")
+
+ax = plt.gca()
+ax.yaxis.set_major_locator(MultipleLocator(5))
+plt.legend(loc="center right")
+
+plt.grid(False)
+plt.tight_layout()
+plt.savefig("FINAL_grafico_meso-BDO.png", dpi=300,  facecolor="white", bbox_inches='tight')
+
+plt.show()
