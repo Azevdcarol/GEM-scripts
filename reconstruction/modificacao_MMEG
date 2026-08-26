@@ -5,24 +5,7 @@
 reacao = model.reactions.get_by_id("BTDD_RR")
 reacao.gene_reaction_rule = "KPN_00000"
 
-==================================================================================================
 
-#criando um metabólito 
-
-ACP_c = Metabolite(
-    'ACP_c',formula ='C11H21N2O7PRS',
-    name='acyl-carrier-protein',
-    compartment='c')  
-
-==================================================================================================
-
-#adicionando os metabólitos a reação 
-
-reaction1.add_metabolites({ 
-    metabolite_A: -1.0, # Reagente 
-    metabolite_B: -2.0, # Reagente 
-    metabolite_C: 1.0 # Produto 
-})
 
 
 ==================================================================================================
