@@ -1,0 +1,61 @@
+# 🔹 DataFrame global (pode ser alimentado pelas simulações)
+df_fluxos_fermentacoes = pd.DataFrame(columns=["Condicao", "Fracao", "Reacao", "Fluxo"])
+
+
+# ======================================================
+# 📉 Função para plotar os fluxos das fermentações
+# ======================================================
+
+def plotar_fluxos_fermentacoes(df_fluxos_fermentacoes, condicao):
+    """
+    Gera gráfico de fluxos de fermentação para uma condição específica,
+    mostrando apenas as reações de exchange (EX_).
+    """
+    import matplotlib.pyplot as plt
+
+    subset = df_fluxos_fermentacoes[df_fluxos_fermentacoes["Condicao"] == condicao]
+
+    # 🔹 Filtra apenas as reações de exchange
+    subset = subset[subset["Reacao"].str.contains("EX_", case=False, na=False)]
+
+    if subset.empty:
+        print("⚠️ Nenhuma reação de exchange encontrada para plotar.")
+        return
+
+    plt.figure(figsize=(10, 6))
+    for reacao in subset["Reacao"].unique():
+        dados = subset[subset["Reacao"] == reacao]
+        plt.plot(dados["Fracao"], dados["Fluxo"], marker='o', label=reacao)
+
+    plt.title(f"Fluxos de reações de exchange — {condicao}")
+    plt.xlabel("Fração da biomassa")
+    plt.ylabel("Fluxo (mmol/gDW/h)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+
+# ======================================================
+# 🧩 Função para aplicar knockout dinâmico
+# ======================================================
+def aplicar_knockout_dinamico(model, df_fluxos_fermentacoes, condicao, threshold=1e-4):
+    subset = df_fluxos_fermentacoes[
+        (df_fluxos_fermentacoes["Condicao"] == condicao)
+        & (df_fluxos_fermentacoes["Fluxo"].abs() > threshold)
+    ]
+
+    reacoes_para_nocautear = subset["Reacao"].unique()
+
+    if len(reacoes_para_nocautear) == 0:
+        print("Nenhuma reação significativa para nocaute.")
+        return []
+
+    print("\n🧬 Reações candidatas a knockout dinâmico:")
+    for rxn in reacoes_para_nocautear:
+        print(f" - {rxn}")
+        try:
+            model.reactions.get_by_id(rxn).knock_out()
+        except KeyError:
+            print(f"   ⚠️ Reação {rxn} não encontrada no modelo.")
+    
+    return list(reacoes_para_nocautear)
