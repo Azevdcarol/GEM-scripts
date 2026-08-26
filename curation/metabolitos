@@ -3,6 +3,15 @@
 for met in model.metabolites:
     print(f"ID: {met.id}, Nome: {met.name}")
 
+============================================================================================================================
+#Pesquisa de metabólito por id
+
+id_metabolite = "actn__R_e"
+
+if id_metabolite in [met.id for met in model.metabolites]:
+    print(f"O metabólito '{id_metabolite}' existe no modelo.")
+else:
+    print(f"O metabólito '{id_metabolite}' não foi encontrado no modelo.")
 
 ============================================================================================================================
 #Pesquisa de informaçãos do metabolito
