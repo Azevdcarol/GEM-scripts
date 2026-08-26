@@ -35,3 +35,23 @@ print(f'{len(model.genes)} genes after modification')
 
 g = Gene("KPN_00000")
 g.name = "RR_dhBut"
+
+==================================================================================================
+
+#criando um metabólito 
+
+ACP_c = Metabolite(
+    'ACP_c',formula ='C11H21N2O7PRS',
+    name='acyl-carrier-protein',
+    compartment='c')  
+
+==================================================================================================
+
+#adicionando os metabólitos a reação 
+
+reaction1.add_metabolites({ 
+    metabolite_A: -1.0, # Reagente 
+    metabolite_B: -2.0, # Reagente 
+    metabolite_C: 1.0 # Produto 
+})
+
