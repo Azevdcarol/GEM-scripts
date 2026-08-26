@@ -1,1 +1,52 @@
 
+#Não esquecer de fazer os imports necessários
+
+
+#para verificar a quantidade de elementos em cada classe
+
+print(f'{len(model.reactions)} reactions initially')
+print(f'{len(model.metabolites)} metabolites initially')
+print(f'{len(model.genes)} genes initially')
+
+===============================================================================================
+#Não esquecer de fazer os imports necessários
+
+#pesquisa se o ID do gene existe
+
+x = Gene("KPN_00000")#ID do gene
+
+if x.id not in model.genes:
+    model.genes += [x] #adiciona ao modelo se o ID nao existir no modelo 
+
+
+===============================================================================================
+#verificando se uma reação existe 
+
+pesquisa = "Meso_BTDD_teste"
+
+if pesquisa in model.reactions:
+    print("A reação já existe no modelo. ")
+    model.reactions.get_by_id(pesquisa)
+else:
+    print("Reação precisa ser adicionada.")
+
+
+===============================================================================================
+#Exibindo informações do gene associado 
+
+gene_id ="KPN_03495"
+
+if gene_id in model.genes:
+    gene = model.genes.get_by_id(gene_id)
+    
+    # Exibir informações do gene
+    print(f"Gene ID: {gene.id}")
+    print(f"Nome: {gene.name or 'Não disponível'}")
+    print(f"Anotações: {gene.annotation or 'Não disponível'}")
+    print(f"Reações associadas: {[r.id for r in gene.reactions]}")
+    print(f"Regras de reações: {{r.id: r.gene_reaction_rule for r in gene.reactions}}")
+else:
+    print(f"Gene '{gene_id}' não encontrado no modelo.")
+
+
+
