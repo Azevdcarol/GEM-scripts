@@ -1,0 +1,28 @@
+============================================================================================================================
+# Listar todos os metabólitos do modelo
+for met in model.metabolites:
+    print(f"ID: {met.id}, Nome: {met.name}")
+
+
+============================================================================================================================
+#Pesquisa de informaçãos do metabolito
+
+id_metabolite = "btoh[c]"
+
+
+metabolito = model.metabolites.get_by_id(id_metabolite)
+
+print(f"ID do Metabólito: {metabolito.id}")
+print(f"Nome: {metabolito.name}")
+print(f"Fórmula: {metabolito.formula}")
+print(f"Compartimento: {metabolito.compartment}")
+print(f"Carregamento (Charge): {metabolito.charge}")
+print(f"Reações associadas: {[r.id for r in metabolito.reactions]}")
+    
+metabolito.summary()   
+
+============================================================================================================================
+
+#exibindo os limites de um metabólito específico
+
+print(model.reactions.EX_glyc_e.bounds) 
