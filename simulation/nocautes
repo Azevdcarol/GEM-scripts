@@ -1,0 +1,18 @@
+
+#Aplicando nocautes a partir de uma lista de reações 
+def aplicar_nocautes(model, lista_reacoes):
+    """
+    Aplica knockouts a uma lista de reações e retorna quais foram efetivamente aplicados.
+    """
+    knockouts_aplicados = []
+
+    for rxn_id in lista_reacoes:
+        try:
+            rxn = model.reactions.get_by_id(rxn_id)
+            rxn.knock_out()  # método nativo do cobrapy
+            print(f"✅ Knockout aplicado: {rxn_id}")
+            knockouts_aplicados.append(rxn_id)
+        except KeyError:
+            print(f"⚠️ Reação '{rxn_id}' não encontrada no modelo. Ignorada.")
+    
+    return knockouts_aplicados
