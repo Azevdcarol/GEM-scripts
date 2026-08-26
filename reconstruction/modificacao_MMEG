@@ -1,0 +1,103 @@
+#Não esquecer de fazer os imports necessários
+
+#Adicionando um nova reação 
+
+reaction = Reaction("Meso_BTDD_teste")
+reaction.name = "BDO_teste"
+#reaction.subsystem = "Subsystem Name" 
+reaction.lower_bound = 0 
+reaction.upper_bound = 1000
+
+metabolite_A = model.metabolites.get_by_id("coa_c")
+metabolite_B = model.metabolites.get_by_id("nadh_c")
+metabolite_C = model.metabolites.get_by_id("pyr_c")
+metabolite_D = model.metabolites.get_by_id("ACP_c")
+
+reaction.add_metabolites({ 
+    metabolite_A: -1.0, # Reagente 
+    metabolite_B: -2.0, # Reagente 
+    metabolite_C: 1.0, # Produto 
+    metabolite_D: 2.0 
+})
+
+model.add_reactions([reaction])
+print("\n")
+print(model.reactions.get_by_id("Meso_BTDD"))
+print(reaction.reaction)
+
+print("\nNew")
+print(f'{len(model.reactions)} reactions after modification')
+print(f'{len(model.metabolites)} metabolites after modification')
+print(f'{len(model.genes)} genes after modification')
+==================================================================================================
+#criando um gene 
+
+g = Gene("KPN_00000")
+g.name = "RR_dhBut"
+
+================================================================================================== 
+#associando um gene a um reação
+
+reacao = model.reactions.get_by_id("BTDD_RR")
+reacao.gene_reaction_rule = "KPN_00000"
+
+==================================================================================================
+
+#criando um metabólito 
+
+ACP_c = Metabolite(
+    'ACP_c',formula ='C11H21N2O7PRS',
+    name='acyl-carrier-protein',
+    compartment='c')  
+
+==================================================================================================
+
+#adicionando os metabólitos a reação 
+
+reaction1.add_metabolites({ 
+    metabolite_A: -1.0, # Reagente 
+    metabolite_B: -2.0, # Reagente 
+    metabolite_C: 1.0 # Produto 
+})
+
+
+==================================================================================================
+#Modificando o nome da reação 
+
+reaction = model.reactions.get_by_id("Meso_BTDD") 
+print(f"Nome atual da reação: {reaction.name}")
+reaction.name = "R S butanediol dehydrogenase"
+print(f"Novo nome da reação: {reaction.name}")
+
+b= model.reactions.get_by_id("Meso_BTDD")#exibe informações da reação
+b
+
+
+==================================================================================================  
+#Excluindo metabólitos 
+r = Reaction("BTDD_RR")
+
+r.subtract_metabolites(r.metabolites) 
+
+print(f"Metabólitos após a remoção: {r.metabolites}")
+
+==================================================================================================
+#Excluindo uma reação 
+
+id_reacao = "Meso_BTDD_teste"
+
+# Verifica se a reação existe no modelo
+if id_reacao in model.reactions:
+    # Obtém a reação do modelo
+    reacao_para_remover = model.reactions.get_by_id(id_reacao)
+    
+    # Remove a reação do modelo
+    model.remove_reactions([reacao_para_remover])
+    
+    # Confirmação da remoção
+    print(f"A reação '{id_reacao}' foi removida do modelo.")
+else:
+    print(f"A reação '{id_reacao}' não foi encontrada no modelo.")
+
+
+  
