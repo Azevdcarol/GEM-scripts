@@ -1,0 +1,70 @@
+import pandas as pd
+import numpy as np
+
+# Lista de reações que você quer monitorar
+list_monitoramento = ["GAPD", "MDH", "13PPDH", "DCTR", "BTDD_RS", "BTDD_SS",
+                      "ALCD2x", "LDH_D", "ALCD19", "GDH_R"]
+
+# DataFrames globais
+df_monitoramento_total = pd.DataFrame(columns=["Condicao", "Fracao", "Reacao", "Fluxo"])
+df_top20_total = pd.DataFrame(columns=["Condicao", "Fracao", "Reacao", "Fluxo", "Rank_abs"])
+
+
+def monitorar_fluxos(sol, frac, condicao):
+    """
+    Registra fluxos das reações monitoradas e o Top20 de maior fluxo absoluto.
+    """
+    global df_monitoramento_total, df_top20_total
+
+    if sol is None:
+        print("⚠️ monitorar_fluxos: solução vazia — pulando.")
+        return
+
+    # ----------------------------
+    # 1) Registrar fluxos monitorados
+    # ----------------------------
+    rows = [{
+        "Condicao": condicao,
+        "Fracao": frac,
+        "Reacao": rxn,
+        "Fluxo": sol.fluxes.get(rxn, np.nan)
+    } for rxn in list_monitoramento]
+
+    df_monitoramento_total = pd.concat(
+        [df_monitoramento_total, pd.DataFrame(rows)],
+        ignore_index=True
+    )
+
+    # ----------------------------
+    # 2) Top20 por módulo dos fluxos
+    # ----------------------------
+    try:
+        fluxos_abs = sol.fluxes.abs().sort_values(ascending=False)
+        top20_ids = fluxos_abs.head(20).index
+    except Exception:
+        top20_ids = []
+
+    if len(top20_ids) > 0:
+        rows_top = [{
+            "Condicao": condicao,
+            "Fracao": frac,
+            "Reacao": rxn,
+            "Fluxo": float(sol.fluxes.get(rxn, np.nan)),
+            "Rank_abs": rank
+        } for rank, rxn in enumerate(top20_ids, start=1)]
+
+        df_top20_total = pd.concat(
+            [df_top20_total, pd.DataFrame(rows_top)],
+            ignore_index=True
+        )
+
+    # ----------------------------
+    # 3) Log resumido
+    # ----------------------------
+    print(f"\n📊 Monitoramento — {condicao} | frac={frac:.2f}")
+    print("\n  • Reações monitoradas:")
+    print(pd.DataFrame(rows).to_string(index=False))
+
+    if len(top20_ids) > 0:
+        print("\n  • Top20 (abs) desta solução:")
+        print(pd.DataFrame(rows_top).head(20).to_string(index=False))
