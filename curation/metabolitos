@@ -26,3 +26,15 @@ metabolito.summary()
 #exibindo os limites de um metabólito específico
 
 print(model.reactions.EX_glyc_e.bounds) 
+
+============================================================================================================================
+
+#Pesquisa de metabólito por nome
+
+nome_metabolite = "pyruvate"
+
+if nome_metabolite in [met.name for met in model.metabolites]:
+    print(f"O metabólito '{nome_metabolite}' existe no modelo.")
+else:
+    print(f"O metabólito '{nome_metabolite}' não foi encontrado no modelo.")
+
