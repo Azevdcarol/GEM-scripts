@@ -1,0 +1,41 @@
+#Função que roda FVA esta na pasta simulation
+
+
+with pd.ExcelWriter("Resultados_FVA_90.xlsx", engine="openpyxl") as writer:
+
+    preparar_fva(fva_crescimento_glicose_aero, model, solution_crescimento_glicose_aero).to_excel(
+        writer,
+        sheet_name="Crescimento_Glicose",
+        index=False
+    )
+    preparar_fva(fva_crescimento_glicose_anaero, model, solution_crescimento_glicose_anaero).to_excel(
+        writer,
+        sheet_name="Crescimento_Glicose",
+        index=False
+    )
+    
+    preparar_fva(fva_crescimento_glicerol_aero, model, solution_crescimento_glicerol_aero).to_excel(
+        writer,
+        sheet_name="Crescimento_Glicerol",
+        index=False
+    )
+
+    preparar_fva(fva_crescimento_glicerol_anaero, model, solution_crescimento_glicerol_anaero).to_excel(
+        writer,
+        sheet_name="Crescimento_Glicerol",
+        index=False
+    )
+
+    preparar_fva(fva_fermentacao_glicose, model, solution_fermentacao_glicose).to_excel(
+        writer,
+        sheet_name="Fermentacao_Glicose",
+        index=False
+    )
+
+    preparar_fva(fva_fermentacao_glicerol, model, solution_fermentacao_glicerol).to_excel(
+        writer,
+        sheet_name="Fermentacao_Glicerol",
+        index=False
+    )
+
+print("Arquivo Resultados_FVA_100.xlsx salvo com sucesso!")
