@@ -6,8 +6,6 @@ reacao = model.reactions.get_by_id("BTDD_RR")
 reacao.gene_reaction_rule = "KPN_00000"
 
 
-
-
 ==================================================================================================
 #Modificando o nome da reação 
 
