@@ -18,33 +18,3 @@ print(f"Novo nome da reação: {reaction.name}")
 
 b= model.reactions.get_by_id("Meso_BTDD")#exibe informações da reação
 b
-
-
-==================================================================================================  
-#Excluindo metabólitos 
-r = Reaction("BTDD_RR")
-
-r.subtract_metabolites(r.metabolites) 
-
-print(f"Metabólitos após a remoção: {r.metabolites}")
-
-==================================================================================================
-#Excluindo uma reação 
-
-id_reacao = "Meso_BTDD_teste"
-
-# Verifica se a reação existe no modelo
-if id_reacao in model.reactions:
-    # Obtém a reação do modelo
-    reacao_para_remover = model.reactions.get_by_id(id_reacao)
-    
-    # Remove a reação do modelo
-    model.remove_reactions([reacao_para_remover])
-    
-    # Confirmação da remoção
-    print(f"A reação '{id_reacao}' foi removida do modelo.")
-else:
-    print(f"A reação '{id_reacao}' não foi encontrada no modelo.")
-
-
-  
