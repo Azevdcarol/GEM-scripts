@@ -1,0 +1,89 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+# ------------------- dados -------------------
+
+fluxo_aero_1 = [983.3368984, 93.20249709, 43.60873188, 26.80264825, 17.33466594, 11.55644396, 7.704295975, 4.952761698 , 2.889110991, 1.284049329, 0]
+fluxo_anaero_1 = [3533.82, 343.9066798, 167.9482081, 109.2953842, 79.96897228, 57.24218916, 41.05571467, 27.94715837, 16.30250905, 7.245559578, 0]
+fluxo_aero_2 = [919.2159624,86.35755277, 40.18625972, 24.7958287,17.09088521, 11.55644396,7.704295975,4.952761698,2.889110991,1.284049329, 0]
+fluxo_anaero_2 = [3639.638298, 353.0923352, 172.5410358,108.5901965,71.47348294,49.2034548,34.35676937, 23.75199407,15.66390884,7.245559578,0]
+
+biomassa_aero_1 = [0.0187,0.1865153807,0.3730307615,0.5595461422,0.7460615229,0.9325769036,1.119092284,1.305607665,1.492123046,1.678638427,1.865153807]
+biomassa_anaero_1 = [0.005, 0.05032259837,0.1006451967,0.1509677951,0.2012903935,0.2516129918,0.3019355902,0.3522581886,0.4025807869,0.4529033853,0.5032259837]
+biomassa_aero_2 = [0.0213, 0.2134118269,0.4268236538,0.6402354806,0.8536473075,1.067059134,1.280470961,1.493882788,1.707294615,1.920706442,2.134118269]
+biomassa_anaero_2 = [0.0047,0.04747759033,0.09495518067,0.142432771,0.1899103613,0.2373879517,0.284865542,0.3323431323,0.3798207227,0.427298313,0.4747759033]
+
+x = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+series_biomassa = {
+    "Glicose aeróbica": biomassa_aero_1,
+    "Glicose anaeróbica": biomassa_anaero_1,
+    "Glicerol aeróbica": biomassa_aero_2,
+    "Glicerol anaeróbica": biomassa_anaero_2    
+}
+
+# ------------------------------------------------------
+# FIGURA PRINCIPAL
+# ------------------------------------------------------
+
+fig, ax = plt.subplots(figsize=(12, 10))  
+
+ms = 10
+lw = 2
+
+ax.plot(x, fluxo_aero_1, marker="o", color="#66C389", label="Glicose aeróbica", linewidth=lw, markersize=ms)
+ax.plot(x, fluxo_anaero_1, marker="o", color="#006D29", linestyle="--", label="Glicose anaeróbica", linewidth=lw, markersize=ms)
+ax.plot(x, fluxo_aero_2, marker="s", color="#EC8C74", label="Glicerol aeróbica", linewidth=lw, markersize=ms)
+ax.plot(x, fluxo_anaero_2, marker="s", color="#A24E39", linestyle="--", label="Glicerol anaeróbica", linewidth=lw, markersize=ms)
+
+ax.set_xticks(x)
+ax.tick_params(axis='x', direction='in', labelsize=12)
+ax.tick_params(axis='y', direction='in', labelsize=12)
+
+ax.set_title("Produção de Meso-BDO", fontsize=18)
+ax.set_xlabel("Biomassa (%)", fontsize=14)
+ax.set_ylabel("Meso-BDO (fluxo/biomassa)", fontsize=14)
+ax.legend(fontsize=12, loc='upper left', bbox_to_anchor=(1.02, 1.0))
+
+
+# ------------------------------------------------------
+# INSET (gráfico menor) - replicando o zoom lateral
+# ------------------------------------------------------
+
+# parâmetros do inset (ajuste livre)
+inset_left = 0.495  # quanto mais próximo de 1, mais à direita
+inset_bottom = 0.550 # elevação vertical do inset
+inset_width = 0.40
+inset_height = 0.30
+
+ax_inset = fig.add_axes([inset_left, inset_bottom, inset_width, inset_height])
+
+# plotar as mesmas curvas no inset (com markers menores)
+ax_inset.plot(x, fluxo_aero_1, marker="o", color="#66C389", linewidth=lw, markersize=6)
+ax_inset.plot(x, fluxo_anaero_1, marker="o", color="#006D29", linestyle="--", linewidth=lw, markersize=6)
+ax_inset.plot(x, fluxo_aero_2, marker="s", color="#EC8C74", linewidth=lw, markersize=6)
+ax_inset.plot(x, fluxo_anaero_2, marker="s", color="#A24E39", linestyle="--", linewidth=lw, markersize=6)
+
+# Zoom vertical: mostrar apenas 0-200 no eixo y (como você pediu)
+ax_inset.set_ylim(-10, 400)
+ax_inset.set_xlim(0, 102)   # mantém toda a extensão do x para comparação visual
+ax_inset.set_xticks([1, 20, 40, 60, 80, 100])
+ax_inset.set_yticks([0,100,200,300,400])
+ax_inset.set_title("Zoom: 0–400", fontsize=10)
+ax_inset.tick_params(axis='both', labelsize=8)
+
+# destaca a borda do inset (opcional)
+for spine in ax_inset.spines.values():
+    spine.set_linewidth(1.0)
+
+# ------------------------------------------------------
+# TABELA
+# ------------------------------------------------------
+
+table = add_aligned_table(ax, x, series_biomassa, fmt="{:.2f}", fontsize=12, table_height=0.17, pad=0.08)
+table.scale(1, 1.6)
+
+# ------------------------------------------------------
+plt.savefig("grafico_mesoBDO_com_zoom.png", dpi=300, facecolor="white", bbox_inches='tight')
+plt.show()
